@@ -34,6 +34,19 @@ SET(CMAKE_C_FLAGS_DEBUG "-g -DUVC_DEBUGGING")
 SET(INSTALL_CMAKE_DIR "${CMAKE_INSTALL_PREFIX}/lib/cmake/libuvc" CACHE PATH
 	"Installation directory for CMake files")
 
+SET(PKG_CONFIG_LIBDIR
+    "\${prefix}/lib"
+)
+SET(PKG_CONFIG_INCLUDEDIR
+    "\${prefix}/include/${PROJECT_NAME}"
+)
+SET(PKG_CONFIG_LIBS
+    "-L\${libdir} -luvc"
+)
+SET(PKG_CONFIG_CFLAGS
+    "-I\${includedir}"
+)
+
 SET(SOURCES src/ctrl.c src/ctrl-gen.c src/device.c src/diag.c
            src/frame.c src/init.c src/stream.c
            src/misc.c)
@@ -95,10 +108,18 @@ configure_file(libuvcConfig.cmake.in ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTOR
 
 configure_file(libuvcConfigVersion.cmake.in ${PROJECT_BINARY_DIR}/libuvcConfigVersion.cmake @ONLY)
 
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/pkg-config/${PROJECT_NAME}.pc.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/pkg-config/${PROJECT_NAME}.pc"
+)
+
 install(FILES
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/libuvcConfig.cmake"
   "${PROJECT_BINARY_DIR}/libuvcConfigVersion.cmake"
   DESTINATION "${INSTALL_CMAKE_DIR}")
+
+INSTALL(FILES "${CMAKE_BINARY_DIR}/pkg-config/${PROJECT_NAME}.pc"
+        DESTINATION lib/pkgconfig)
 
 install(EXPORT libuvcTargets
   DESTINATION "${INSTALL_CMAKE_DIR}")
